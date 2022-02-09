@@ -29,7 +29,14 @@ class IconContainer extends St.Widget {
 
 var BackgroundLogo = GObject.registerClass(
 class BackgroundLogo extends St.Widget {
-    _init(backgroundActor) {
+    constructor(backgroundActor) {
+        super({
+            layout_manager: new Clutter.BinLayout(),
+            x_expand: true,
+            y_expand: true,
+            opacity: 0,
+        });
+
         this._backgroundActor = backgroundActor;
         this._monitorIndex = this._backgroundActor.monitor;
 
@@ -64,12 +71,6 @@ class BackgroundLogo extends St.Widget {
             this._updateLogoTexture();
         });
 
-        super._init({
-            layout_manager: new Clutter.BinLayout(),
-            x_expand: true,
-            y_expand: true,
-            opacity: 0,
-        });
         this._backgroundActor.layout_manager = new Clutter.BinLayout();
         this._backgroundActor.add_child(this);
 

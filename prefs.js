@@ -21,8 +21,8 @@ const PREVIEW_WIDTH = 400;
 
 const PreviewGroup = GObject.registerClass(
 class PreviewGroup extends Adw.PreferencesGroup {
-    _init(settings) {
-        super._init();
+    constructor(settings) {
+        super();
 
         this._settings = settings;
         this._settings.connect('changed', (s, key) => {
@@ -149,15 +149,15 @@ const LogoPosition = GObject.registerClass({
             null),
     },
 }, class LogoPosition extends GObject.Object {
-    _init(name, value) {
-        super._init({name, value});
+    constructor(name, value) {
+        super({name, value});
     }
 });
 
 const LogoGroup = GObject.registerClass(
 class LogoGroup extends Adw.PreferencesGroup {
-    _init(settings) {
-        super._init({title: 'Logo'});
+    constructor(settings) {
+        super({title: 'Logo'});
 
         this._settings = settings;
         this._fileChooserKey = '';
@@ -297,8 +297,8 @@ class LogoGroup extends Adw.PreferencesGroup {
 
 const OptionsGroup = GObject.registerClass(
 class OptionsGroup extends Adw.PreferencesGroup {
-    _init(settings) {
-        super._init({title: 'Options'});
+    constructor(settings) {
+        super({title: 'Options'});
 
         this._settings = settings;
         const alwaysShowSwitch = new Gtk.Switch({
@@ -319,8 +319,8 @@ class OptionsGroup extends Adw.PreferencesGroup {
 
 const BackgroundLogoPrefsWidget = GObject.registerClass(
 class BackgroundLogoPrefsWidget extends Adw.PreferencesPage {
-    _init(settings) {
-        super._init();
+    constructor(settings) {
+        super();
 
         this.add(new PreviewGroup(settings));
         this.add(new LogoGroup(settings));
