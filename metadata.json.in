@@ -6,5 +6,5 @@
   "shell-version": [
     "@shell_version@"
   ],
-  "url": "https://pagure.io/background-logo-extension"
+  "url": "https://forge.fedoraproject.org/workstation/background-logo-extension"
 }
