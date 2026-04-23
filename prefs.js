@@ -10,7 +10,6 @@ import GLib from 'gi://GLib';
 import GObject from 'gi://GObject';
 import GnomeDesktop from 'gi://GnomeDesktop?version=4.0';
 import Gtk from 'gi://Gtk';
-const ByteArray = imports.byteArray;
 
 import {ExtensionPreferences} from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
 
@@ -77,7 +76,7 @@ class PreviewGroup extends Adw.PreferencesGroup {
             return Gio.File.new_for_commandline_arg(filename1);
         } else {
             const [, contents] = file.load_contents(null);
-            const str = ByteArray.toString(contents);
+            const str = new TextDecoder().decode(contents);
             const [, filename1] = str.match(/<file>(.*)<\/file>/);
             return Gio.File.new_for_commandline_arg(filename1);
         }
