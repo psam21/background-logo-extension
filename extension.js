@@ -29,7 +29,7 @@ class IconContainer extends St.Widget {
 
 var BackgroundLogo = GObject.registerClass(
 class BackgroundLogo extends St.Widget {
-    constructor(backgroundActor) {
+    constructor(backgroundActor, settings) {
         super({
             layout_manager: new Clutter.BinLayout(),
             x_expand: true,
@@ -42,7 +42,7 @@ class BackgroundLogo extends St.Widget {
 
         this._logoFile = null;
 
-        this._settings = Extension.lookupByURL(import.meta.url).getSettings();
+        this._settings = settings;
         this._ifaceSettings = new Gio.Settings({
             schema_id: 'org.gnome.desktop.interface',
         });
@@ -252,10 +252,11 @@ export default class BackgroundLogoExtension extends Extension {
     enable() {
         const bgMgrProto = Background.BackgroundManager.prototype;
         this._injectionManager.overrideMethod(bgMgrProto, '_createBackgroundActor', originalMethod => {
+            const settings = this.getSettings();
             /* eslint-disable no-invalid-this */
             return function () {
                 const backgroundActor = originalMethod.call(this);
-                const logo_ = new BackgroundLogo(backgroundActor);
+                const logo_ = new BackgroundLogo(backgroundActor, settings);
 
                 return backgroundActor;
             };
