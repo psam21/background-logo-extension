@@ -47,37 +47,34 @@ class BackgroundLogo extends St.Widget {
             schema_id: 'org.gnome.desktop.interface',
         });
 
-        this._settings.connect('changed::logo-file',
-            this._updateLogo.bind(this));
-        this._settings.connect('changed::logo-file-dark',
-            this._updateLogo.bind(this));
-        this._settings.connect('changed::logo-size', () => {
-            this._updateScale();
-            this.queue_relayout();
-        });
-        this._settings.connect('changed::logo-position',
-            this._updatePosition.bind(this));
-        this._settings.connect('changed::logo-border',
-            this._updateBorder.bind(this));
-        this._settings.connect('changed::logo-opacity',
-            this._updateOpacity.bind(this));
-        this._settings.connect('changed::logo-always-visible',
-            this._updateVisibility.bind(this));
+        this._settings.connectObject(
+            'changed::logo-file', () => this._updateLogo(),
+            'changed::logo-file-dark', () => this._updateLogo(),
+            'changed::logo-position', () => this._updatePosition(),
+            'changed::logo-border', () => this._updateBorder(),
+            'changed::logo-opacity', () => this._updateOpacity(),
+            'changed::logo-always-visible', () => this._updateVisibility(),
+            'changed::logo-size', () => {
+                this._updateScale();
+                this.queue_relayout();
+            }, this);
 
         this._textureCache = St.TextureCache.get_default();
-        this._textureCache.connect('texture-file-changed', (cache, file) => {
-            if (!this._logoFile || !this._logoFile.equal(file))
-                return;
-            this._updateLogoTexture();
-        });
+        this._textureCache.connectObject('texture-file-changed',
+            (cache, file) => {
+                if (!this._logoFile || !this._logoFile.equal(file))
+                    return;
+                this._updateLogoTexture();
+            });
 
         this._backgroundActor.layout_manager = new Clutter.BinLayout();
         this._backgroundActor.add_child(this);
 
         this.connect('destroy', this._onDestroy.bind(this));
 
-        this._backgroundActor.content.connect('notify::brightness',
-            this._updateOpacity.bind(this));
+        this._backgroundActor.content.connectObject(
+            'notify::brightness', () => this._updateOpacity(),
+            this);
 
         this._bin = new IconContainer({x_expand: true, y_expand: true});
         this.add_child(this._bin);
@@ -235,7 +232,6 @@ class BackgroundLogo extends St.Widget {
         this._laterId = 0;
 
         this._backgroundActor.layout_manager = null;
-        this._settings.run_dispose();
         this._settings = null;
 
         this._logoFile = null;
