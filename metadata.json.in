@@ -6,5 +6,6 @@
   "shell-version": [
     "@shell_version@"
   ],
+  "version-name": "@version@",
   "url": "https://forge.fedoraproject.org/workstation/background-logo-extension"
 }

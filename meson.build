@@ -31,6 +31,7 @@ have_schemas = schemas.length() > 0
 metaconf = configuration_data()
 metaconf.set('uuid', uuid)
 metaconf.set('shell_version', shell_version)
+metaconf.set('version', meson.project_version())
 if have_schemas
   metaconf.set('settings_schema', schemas[0])
 endif
