@@ -240,17 +240,14 @@ class BackgroundLogo extends St.Widget {
 
 
 export default class BackgroundLogoExtension extends Extension {
-    constructor(metadata) {
-        super(metadata);
-        this._injectionManager = new InjectionManager();
-    }
-
     _reloadBackgrounds() {
         Main.layoutManager._updateBackgrounds();
     }
 
     enable() {
         const bgMgrProto = Background.BackgroundManager.prototype;
+
+        this._injectionManager = new InjectionManager();
         this._injectionManager.overrideMethod(bgMgrProto, '_createBackgroundActor', originalMethod => {
             const settings = this.getSettings();
             /* eslint-disable no-invalid-this */
@@ -267,6 +264,7 @@ export default class BackgroundLogoExtension extends Extension {
 
     disable() {
         this._injectionManager.clear();
+        this._injectionManager = null;
         this._reloadBackgrounds();
     }
 }
