@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2019 Red Hat, Inc.
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+
 project('background-logo-extension',
   version: '50.0',
   meson_version: '>= 0.58.0'
