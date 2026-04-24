@@ -13,6 +13,7 @@ import {Extension, InjectionManager} from 'resource:///org/gnome/shell/extension
 
 import * as Background from 'resource:///org/gnome/shell/ui/background.js';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
+import {EventEmitter} from 'resource:///org/gnome/shell/misc/signals.js';
 
 var IconContainer = GObject.registerClass(
 class IconContainer extends St.Widget {
@@ -29,7 +30,7 @@ class IconContainer extends St.Widget {
 
 var BackgroundLogo = GObject.registerClass(
 class BackgroundLogo extends St.Widget {
-    constructor(backgroundActor, settings) {
+    constructor(backgroundActor, settings, cache) {
         super({
             layout_manager: new Clutter.BinLayout(),
             x_expand: true,
@@ -40,6 +41,7 @@ class BackgroundLogo extends St.Widget {
         this._backgroundActor = backgroundActor;
         this._monitorIndex = this._backgroundActor.monitor;
 
+        this._logoCache = cache;
         this._logoFile = null;
 
         this._settings = settings;
@@ -59,13 +61,10 @@ class BackgroundLogo extends St.Widget {
                 this.queue_relayout();
             }, this);
 
-        this._textureCache = St.TextureCache.get_default();
-        this._textureCache.connectObject('texture-file-changed',
-            (cache, file) => {
-                if (!this._logoFile || !this._logoFile.equal(file))
-                    return;
+        this._logoCache.connectObject('texture-file-changed', (c, file) => {
+            if (this._logoFile?.equal(file))
                 this._updateLogoTexture();
-            }, this);
+        }, this);
 
         this._backgroundActor.layout_manager = new Clutter.BinLayout();
         this._backgroundActor.add_child(this);
@@ -138,8 +137,7 @@ class BackgroundLogo extends St.Widget {
         let width = this._getWidthForRelativeSize(max);
 
         const resourceScale = this._bin.get_resource_scale();
-        let scaleFactor = St.ThemeContext.get_for_stage(global.stage).scale_factor;
-        this._icon = this._textureCache.load_file_async(this._logoFile, width, -1, scaleFactor, resourceScale);
+        this._icon = this._logoCache.loadFile(this._logoFile, width, resourceScale);
         this._icon.connect('notify::content',
             this._updateScale.bind(this));
         this._bin.add_child(this._icon);
@@ -238,6 +236,69 @@ class BackgroundLogo extends St.Widget {
     }
 });
 
+class LogoTextureCache extends EventEmitter {
+    #textures = new Map();
+    #textureCache;
+
+    loadFile(file, width, resourceScale) {
+        const themeContext = St.ThemeContext.get_for_stage(global.stage);
+        const paintScale = themeContext.scale_factor;
+        const scale = Math.ceil(paintScale * resourceScale);
+        const key = `file:${file.hash()}:${scale}:${width}`;
+
+        let content = this.#textures.get(key);
+        if (content) {
+            return new Clutter.Actor({
+                request_mode: Clutter.RequestMode.CONTENT_SIZE,
+                content,
+            });
+        }
+
+        this.#ensureCache();
+
+        const actor = this.#textureCache.load_file_async(file,
+            width, -1,
+            paintScale, resourceScale);
+
+        actor.connectObject('notify::content', () => {
+            actor.disconnectObject(this);
+            this.#textures.set(key, actor.content);
+        }, this);
+
+        return actor;
+    }
+
+    clear() {
+        this.#textureCache.disconnectObject(this);
+        this.#textureCache = null;
+
+        this.#textures.clear();
+    }
+
+    #ensureCache() {
+        if (this.#textureCache)
+            return;
+
+        this.#textureCache = St.TextureCache.get_default();
+        this.#textureCache.connectObject('texture-file-changed',
+            (cache, file) => {
+                const prefix = `file:${file.hash()}`;
+                if (this.#removeTextures(prefix))
+                    this.emit('texture-file-changed', file);
+            }, this);
+    }
+
+    #removeTextures(prefix) {
+        let deleted = false;
+
+        for (const [key] of this.#textures) {
+            if (key.startsWith(prefix))
+                deleted = this.#textures.delete(key);
+        }
+
+        return deleted;
+    }
+}
 
 export default class BackgroundLogoExtension extends Extension {
     _reloadBackgrounds() {
@@ -247,13 +308,16 @@ export default class BackgroundLogoExtension extends Extension {
     enable() {
         const bgMgrProto = Background.BackgroundManager.prototype;
 
+        const cache = new LogoTextureCache();
+        this._logoCache = cache;
+
         this._injectionManager = new InjectionManager();
         this._injectionManager.overrideMethod(bgMgrProto, '_createBackgroundActor', originalMethod => {
             const settings = this.getSettings();
             /* eslint-disable no-invalid-this */
             return function () {
                 const backgroundActor = originalMethod.call(this);
-                const logo_ = new BackgroundLogo(backgroundActor, settings);
+                const logo_ = new BackgroundLogo(backgroundActor, settings, cache);
 
                 return backgroundActor;
             };
@@ -265,6 +329,10 @@ export default class BackgroundLogoExtension extends Extension {
     disable() {
         this._injectionManager.clear();
         this._injectionManager = null;
+
+        this._logoCache.clear();
+        this._logoCache = null;
+
         this._reloadBackgrounds();
     }
 }
