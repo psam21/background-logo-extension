@@ -44,6 +44,11 @@ class BackgroundLogo extends St.Widget {
         this._logoCache = cache;
         this._logoFile = null;
 
+        this._bin = new IconContainer({x_expand: true, y_expand: true});
+        this.add_child(this._bin);
+        this._bin.connect('resource-scale-changed',
+            this._updateLogoTexture.bind(this));
+
         this._settings = settings;
         this._ifaceSettings = new Gio.Settings({
             schema_id: 'org.gnome.desktop.interface',
@@ -74,11 +79,6 @@ class BackgroundLogo extends St.Widget {
         this._backgroundActor.content.connectObject(
             'notify::brightness', () => this._updateOpacity(),
             this);
-
-        this._bin = new IconContainer({x_expand: true, y_expand: true});
-        this.add_child(this._bin);
-        this._bin.connect('resource-scale-changed',
-            this._updateLogoTexture.bind(this));
 
         this._updateLogo();
         this._updatePosition();
