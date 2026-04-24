@@ -65,7 +65,7 @@ class BackgroundLogo extends St.Widget {
                 if (!this._logoFile || !this._logoFile.equal(file))
                     return;
                 this._updateLogoTexture();
-            });
+            }, this);
 
         this._backgroundActor.layout_manager = new Clutter.BinLayout();
         this._backgroundActor.add_child(this);
