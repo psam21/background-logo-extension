@@ -15,7 +15,7 @@ import * as Background from 'resource:///org/gnome/shell/ui/background.js';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import {EventEmitter} from 'resource:///org/gnome/shell/misc/signals.js';
 
-var IconContainer = GObject.registerClass(
+const IconContainer = GObject.registerClass(
 class IconContainer extends St.Widget {
     vfunc_get_preferred_width(forHeight) {
         let width = super.vfunc_get_preferred_width(forHeight);
@@ -28,7 +28,7 @@ class IconContainer extends St.Widget {
     }
 });
 
-var BackgroundLogo = GObject.registerClass(
+const BackgroundLogo = GObject.registerClass(
 class BackgroundLogo extends St.Widget {
     constructor(backgroundActor, settings, cache) {
         super({
