@@ -16,7 +16,7 @@ import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import {EventEmitter} from 'resource:///org/gnome/shell/misc/signals.js';
 
 const IconContainer = GObject.registerClass(
-class IconContainer extends St.Widget {
+class IconContainer extends Clutter.Actor {
     vfunc_get_preferred_width(forHeight) {
         let width = super.vfunc_get_preferred_width(forHeight);
         return width.map(w => w * this.scale_x);
