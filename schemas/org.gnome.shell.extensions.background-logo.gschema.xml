@@ -7,7 +7,7 @@ SPDX-License-Identifier: GPL-2.0-or-later
 -->
 
 <schemalist gettext-domain="background-logo-extension">
-  <enum id="org.fedorahosted.background-logo-extension.Position">
+  <enum id="org.gnome.shell.extensions.background-logo.Position">
     <value nick="center" value="0"/>
     <value nick="bottom-left" value="1"/>
     <value nick="bottom-center" value="2"/>
@@ -17,8 +17,8 @@ SPDX-License-Identifier: GPL-2.0-or-later
     <value nick="top-right" value="6" />
   </enum>
 
-  <schema path="/org/fedorahosted/background-logo-extension/"
-          id="org.fedorahosted.background-logo-extension">
+  <schema path="/org/gnome/shell/extensions/background-logo/"
+          id="org.gnome.shell.extensions.background-logo">
     <key type="s" name="logo-file">
       <default>'/usr/share/fedora-logos/fedora_lightbackground.svg'</default>
       <summary>Logo file</summary>
@@ -30,7 +30,7 @@ SPDX-License-Identifier: GPL-2.0-or-later
       <description>The full logo file path for dark mode</description>
     </key>
     <key name="logo-position"
-         enum="org.fedorahosted.background-logo-extension.Position">
+         enum="org.gnome.shell.extensions.background-logo.Position">
       <default>'bottom-right'</default>
       <summary>Logo position</summary>
       <description>

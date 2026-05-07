@@ -15,7 +15,7 @@ sources = [
 ]
 extra_sources = ['COPYING']
 
-schemas = ['org.fedorahosted.background-logo-extension']
+schemas = ['org.gnome.shell.extensions.background-logo']
 
 uuid = 'background-logo@fedorahosted.org'
 
