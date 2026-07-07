@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 project('background-logo-extension',
-  version: '50.1',
+  version: '51.alpha',
   meson_version: '>= 0.58.0'
 )
 

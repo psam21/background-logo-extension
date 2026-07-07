@@ -1,3 +1,7 @@
+51.alpha
+========
+ * Rename GSettings schema [Florian; #55]
+
 50.1
 ====
  * Cache logo texture to avoid flicker [Florian; #52]
